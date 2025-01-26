@@ -1,17 +1,26 @@
 import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Universe from "./components/Universe";
 import LoadingPage from "./components/LoadingPage";
-import Universe from "./components/Universe";  // Make sure the path is correct
 
 export default function App() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <>
-      {!isLoaded ? (
-        <LoadingPage onLoaded={() => setIsLoaded(true)} />
-      ) : (
-        <Universe />
-      )}
-    </>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            !isLoaded ? (
+              <LoadingPage onLoaded={() => setIsLoaded(true)} />
+            ) : (
+              <Universe />
+            )
+          }
+        />
+        {/* Aggiungi altre rotte se necessario */}
+      </Routes>
+    </Router>
   );
 }
