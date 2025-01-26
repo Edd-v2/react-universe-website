@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Canvas, useLoader } from "@react-three/fiber";
-import { OrbitControls, Environment } from "@react-three/drei"; 
-import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";  
+import { OrbitControls } from "@react-three/drei";
 import { TextureLoader } from "three";
 
 // Planet component
@@ -23,7 +22,7 @@ function Planet({ position, textureMap, scale, emissiveColor, onClick }) {
   );
 }
 
-// Universe component
+
 export default function Universe() {
   const [message, setMessage] = useState("Click a planet!");
 
@@ -31,9 +30,6 @@ export default function Universe() {
     setMessage(`You clicked on ${planetName}`);
     console.log(`Planet clicked: ${planetName}`);
   };
-
-  // Load HDR texture for environment
-  const hdrTexture = useLoader(RGBELoader, "./nebula.hdr");
 
   // Load textures for each planet
   const earthTexture = useLoader(TextureLoader, "./textures/8k_earth_daymap.jpg");
@@ -55,9 +51,6 @@ export default function Universe() {
           color="white" 
           castShadow
         />
-        
-        {/* Environment with custom HDR texture */}
-        <Environment map={hdrTexture} background />
 
         {/* Planets */}
         <Planet
@@ -97,6 +90,9 @@ export default function Universe() {
       >
         {message}
       </div>
+
+      {/* Rotating background */}
+      <div className="rotating-background" />
     </div>
   );
 }

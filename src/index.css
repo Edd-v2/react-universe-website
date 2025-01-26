@@ -130,7 +130,30 @@ button:focus-visible {
   gap: 2rem;  /* O maggiore, come gap-24 o gap-32 */
 }
 /* Maggiore distanza tra il cerchio e la scritta */
+
 .motion-div h1 {
   margin-top: 2rem; /* Aggiungi spazio sopra il testo */
 }
 
+
+/*  Home */
+.rotating-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: url('./8k_stars.jpg') no-repeat center center;
+  background-size: cover; /* Aumenta la dimensione della texture */
+  animation: rotateBackground 14s infinite linear;
+  z-index: -1;
+}
+
+@keyframes rotateBackground {
+  0% {
+    transform: rotate(0deg) scale(2); /* Scale a 1 */
+  }
+  100% {
+    transform: rotate(360deg) scale(4); /* Scala fino a 1.5 volte */
+  }
+}
