@@ -24,17 +24,19 @@ export default function Universe() {
   const { mercuryTexture, venusTexture, earthTexture, marsTexture, jupiterTexture, saturnTexture, saturnRingsTexture, uranusTexture, neptuneTexture, sunTexture } = useTextures();
   const [loading, setLoading] = useState(false);
   const [selectedPlanet, setSelectedPlanet] = useState(null);
-  const planetRefs = useRef([]);
+
   const [cameraTarget, setCameraTarget] = useState([40, 30, -170]); // Initial target (Earth's position)
   const orbitControlsRef = useRef();
   const cameraPosition = useRef([40, 30, -170]); // Starting camera position
 
   useEffect(() => {
-    document.body.style.background = "url('./../public/8k_stars.jpg') no-repeat center center";
-    document.body.style.backgroundSize = "cover";
     if (!orbitControlsRef.current) return;
     orbitControlsRef.current.enableZoom = false; // Disable zoom while moving the camera
   }, []);
+
+  if (!mercuryTexture || !venusTexture || !earthTexture || !marsTexture || !jupiterTexture || !saturnTexture || !saturnRingsTexture || !uranusTexture || !neptuneTexture || !sunTexture) {
+    return <div>Loading textures...</div>;
+  }
 
   const planetData = [
     { name: "mercury", orbitRadius: 25, texture: mercuryTexture, scale: [1.5, 1.5, 1.5], speed: 2 },
@@ -47,71 +49,29 @@ export default function Universe() {
     { name: "neptune", orbitRadius: 135, texture: neptuneTexture, scale: [3.9, 3.9, 3.9], speed: 0.3 },
   ];
 
-  const handlePlanetClick = (planetName, planet) => {
+  const handlePlanetClick = (planetName, position) => {
     setMessage(`You clicked on ${planetName}`);
     setLoading(true);
     setSelectedPlanet(planetName);
-    
-    // Get current position of the planet
-    const x = Math.cos(planet.current.orbitAngle.current) * planet.current.orbitRadius;
-    const z = Math.sin(planet.current.orbitAngle.current) * planet.current.orbitRadius;
-    
-    // Set this planet as the new center
-    planet.current.isSelected = true;
-    setCameraTarget([x, 0, z]);
+    setCameraTarget(position);
   };
-
-  const renderScene = () => (
-    <Canvas>
-      <OrbitControls ref={orbitControlsRef} enableZoom={true} enablePan={true} enableRotate={true} />
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
-      <CameraMovement cameraTarget={cameraTarget} cameraPosition={cameraPosition} />
-      
-      {/* Sun */}
-      <mesh>
-        <sphereGeometry args={[10, 32, 32]} />
-        <meshStandardMaterial map={sunTexture} />
-      </mesh>
-
-      {/* Planets */}
-      {planetData.map((planet, index) => (
-        <PlanetOrbit key={planet.name} planet={planet} index={index} />
-      ))}
-    </Canvas>
-  );
 
   const handleBackToStart = () => {
     setSelectedPlanet(null);
     setMessage("Click a planet!");
     setLoading(false);
-    
-    // Reset all planets' isSelected state
-    planetRefs.current.forEach(ref => {
-      if (ref.current) {
-        ref.current.isSelected = false;
-      }
-    });
-    
-    // Return to sun-centric view
     setCameraTarget([30, 0, -45]);
   };
 
-  const PlanetOrbit = ({ planet, index }) => {
-    const planetRef = useRef();
-    // Store ref in planetRefs array
-    planetRefs.current[index] = planetRef;
-    
-    return (
+  const PlanetOrbit = ({ planet }) => (
     <>
       <Planet
-        ref={planetRef}
         position={[0, 0, 0]}
         textureMap={planet.texture}
         scale={planet.scale}
         speed={planet.speed}
         orbitRadius={planet.orbitRadius}
-        onClick={() => handlePlanetClick(planet.name, planetRef)}
+        onClick={() => handlePlanetClick(planet.name, [planet.orbitRadius, 0, 0])}
       />
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[planet.orbitRadius - 0.2, planet.orbitRadius + 0.2, 128]} />
@@ -119,25 +79,6 @@ export default function Universe() {
       </mesh>
     </>
   );
-
-  if (!mercuryTexture || !venusTexture || !earthTexture || !marsTexture || !jupiterTexture || !saturnTexture || !saturnRingsTexture || !uranusTexture || !neptuneTexture || !sunTexture) {
-    return <div>Loading textures...</div>;
-  }
-
-  return (
-    <>
-      <div className="rotating-background" />
-      {loading && <div className="loading-overlay">Loading...</div>}
-      {message && <div className="message-overlay">{message}</div>}
-      {selectedPlanet && (
-        <button className="back-button" onClick={handleBackToStart}>
-          Back to Solar System
-        </button>
-      )}
-      {renderScene()}
-    </>
-  );
-  }
 
   const SaturnWithRings = ({ orbitRadius }) => (
     <group>
@@ -165,44 +106,3 @@ export default function Universe() {
       </mesh>
     </group>
   );
-
-  return (
-    <div style={{ width: "100vw", height: "100vh" }}>
-      <div style={{ position: "absolute", top: "20px", left: "20px", color: "white", zIndex: 1 }}>
-        {message}
-      </div>
-      {selectedPlanet && (
-        <button
-          onClick={handleBackToStart}
-          style={{
-            position: "absolute",
-            top: "60px",
-            left: "20px",
-            zIndex: 1,
-            padding: "10px",
-            cursor: "pointer",
-          }}
-        >
-          Back to Start
-        </button>
-      )}
-      <Canvas camera={{ position: cameraPosition.current }}>
-        <CameraMovement cameraTarget={cameraTarget} cameraPosition={cameraPosition} />
-        <OrbitControls ref={orbitControlsRef} enablePan={false} />
-        <ambientLight intensity={0.5} />
-        <pointLight position={[0, 0, 0]} intensity={1} />
-        
-        {/* Sun */}
-        <Planet position={[0, 0, 0]} textureMap={sunTexture} scale={[12, 12, 12]} emissiveColor="yellow" speed={0.1} />
-
-        {/* Planet Orbits */}
-        {planetData.map((planet, index) => (
-          <PlanetOrbit key={planet.name} planet={planet} index={index} />
-        ))}
-
-        {/* Saturn with Rings */}
-        <SaturnWithRings orbitRadius={95} />
-      </Canvas>
-    </div>
-  );
-}
