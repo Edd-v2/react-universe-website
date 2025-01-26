@@ -136,30 +136,6 @@ button:focus-visible {
 }
 
 
-/*  Home */
-.rotating-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: url("./../public/8k_stars.jpg") no-repeat center center;
-  background-size: cover; /* Aumenta la dimensione della texture */
-  animation: rotateBackground 500s infinite linear;
-  z-index: -1;
-}
-
-@keyframes rotateBackground {
-  0% {
-    transform: rotate(0deg) scale(2); /* Scale a 1 */
-  }
-  100% {
-    transform: rotate(360deg) scale(4); /* Scala fino a 1.5 volte */
-  }
-}
-
-
-
 /* Aggiungi al tuo CSS globale */
 .loading-screen {
   display: flex;
